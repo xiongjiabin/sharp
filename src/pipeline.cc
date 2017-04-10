@@ -117,6 +117,14 @@ class PipelineWorker : public Nan::AsyncWorker {
         std::swap(inputWidth, inputHeight);
       }
 
+      /*if (baton->lmdangle > 0) {
+        int halfWidth = inputWidth >> 1;
+        int halfHeight = inputHeight >> 1;
+        int realWidth = sqrt( halfWidth * halfWidth + halfHeight * halfHeight);
+        //baton->width = baton->height = realWidth << 1;
+        //printf("oldsize w=%d,h=%d,resize %d,%d \n", inputWidth, inputHeight, baton->height, baton->width);
+      }*/
+
       // Scaling calculations
       double xfactor = 1.0;
       double yfactor = 1.0;
@@ -427,6 +435,12 @@ class PipelineWorker : public Nan::AsyncWorker {
       if (!baton->rotateBeforePreExtract && rotation != VIPS_ANGLE_D0) {
         image = image.rot(rotation);
         sharp::RemoveExifOrientation(image);
+      }
+
+      if (baton->lmdangle > 0) {
+        vips::VOption *option = VImage::option()->set("angle", baton->lmdangle);
+        image = image.similarity(option);
+        //printf("here angle is %d\n", baton->lmdangle);
       }
 
       // Flip (mirror about Y axis)
@@ -1152,6 +1166,7 @@ NAN_METHOD(pipeline) {
   baton->greyscale = AttrTo<bool>(options, "greyscale");
   baton->normalise = AttrTo<bool>(options, "normalise");
   baton->angle = AttrTo<int32_t>(options, "angle");
+  baton->lmdangle = AttrTo<int32_t>(options,"lmdangle");
   baton->rotateBeforePreExtract = AttrTo<bool>(options, "rotateBeforePreExtract");
   baton->flip = AttrTo<bool>(options, "flip");
   baton->flop = AttrTo<bool>(options, "flop");

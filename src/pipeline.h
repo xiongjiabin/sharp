@@ -81,6 +81,7 @@ struct PipelineBaton {
   bool greyscale;
   bool normalise;
   int angle;
+  int lmdangle;
   bool rotateBeforePreExtract;
   bool flip;
   bool flop;
@@ -156,6 +157,7 @@ struct PipelineBaton {
     greyscale(false),
     normalise(false),
     angle(0),
+    lmdangle(0),
     flip(false),
     flop(false),
     extendTop(0),
